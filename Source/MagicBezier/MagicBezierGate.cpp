@@ -1,7 +1,8 @@
 #include "MagicBezierGate.h"
 #include "ConstructorHelpers.h"
-#include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "ComponentReregisterContext.h"
+#include "Editor.h"
 
 // Sets default values
 AMagicBezierGate::AMagicBezierGate()
@@ -9,9 +10,8 @@ AMagicBezierGate::AMagicBezierGate()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	USphereComponent* SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
-	RootComponent = SphereComponent;
-	SphereComponent->SetCollisionProfileName(TEXT("NoCollision"));
+	USceneComponent* EmptyComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	RootComponent = EmptyComponent;
 	
 	// Set default gate static mesh
 	GateVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
@@ -22,7 +22,8 @@ AMagicBezierGate::AMagicBezierGate()
 		UE_LOG(LogTemp, Log, TEXT("Gate static mesh loaded"));
 
 		Gate = GateVisualAsset.Object;
-		GateVisual->SetStaticMesh(Gate);	
+		GateVisual->SetStaticMesh(Gate);
+		GateVisual->SetCollisionProfileName(TEXT("NoCollision"));
 	}
 	else
 	{
@@ -51,9 +52,23 @@ void AMagicBezierGate::Tick(float DeltaTime)
 #if WITH_EDITOR
 void AMagicBezierGate::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	GateVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
-	GateVisual->SetupAttachment(RootComponent);
-	GateVisual->SetStaticMesh(Gate);
+	TArray<UActorComponent*> MyComponents;
+	GetComponents(MyComponents);
+	
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if ((PropertyName == GET_MEMBER_NAME_CHECKED(AMagicBezierGate, Gate)))
+	{
+		FMultiComponentReregisterContext ReregisterContext(MyComponents);
+
+		for (UActorComponent* Comp : MyComponents)
+		{
+			if (UStaticMeshComponent* MeshComp = Cast<UStaticMeshComponent>(Comp))
+			{
+				GateVisual->SetStaticMesh(Gate); // Update the component to the new mesh
+				GEditor->EditorUpdateComponents();
+			}
+		}
+	}
 }
 #endif
 
