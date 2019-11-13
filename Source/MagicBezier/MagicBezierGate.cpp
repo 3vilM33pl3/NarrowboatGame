@@ -4,8 +4,10 @@
 #include "ComponentReregisterContext.h"
 #include "Editor.h"
 #include <Runtime\Engine\Classes\Kismet\KismetMathLibrary.h>
+#include "MagicBezierFunctions.h"
+#include "DrawDebugHelpers.h"
 
-void AMagicBezierGate::CalculateControlPoints()
+void AMagicBezierGate::CalculateControlCubicBezier()
 {
 	P0 = GetActorLocation();
 
@@ -21,13 +23,17 @@ void AMagicBezierGate::CalculateControlPoints()
 		P2.X = P2.X * BezierStrength * -1;
 		P2 = NextGate->GetTransform().TransformPosition(P2);
 	}
+
+	CubicBezierCurvePoints = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0f / DebugLineNumberOfPoints);
+	Length = MagicBezierFunctions::CubicBezierCurveLength(CubicBezierCurvePoints);
+	
 }
 
 // Sets default values
 AMagicBezierGate::AMagicBezierGate()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick =  true;
 
 	USceneComponent* EmptyComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	RootComponent = EmptyComponent;
@@ -54,6 +60,7 @@ AMagicBezierGate::AMagicBezierGate()
 // Called when the game starts or when spawned
 void AMagicBezierGate::BeginPlay()
 {
+	CalculateControlCubicBezier();
 	Super::BeginPlay();	
 }
 
@@ -61,12 +68,19 @@ void AMagicBezierGate::BeginPlay()
 void AMagicBezierGate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	for(FVector L: CubicBezierCurvePoints)
+	{
+		DrawDebugPoint(GetWorld(), L, 10, FColor(255, 0, 0), false, 0);
+	}
+	
+	
 
 }
 
 void AMagicBezierGate::OnConstruction(const FTransform& Transform)
 {
-	CalculateControlPoints();
+	CalculateControlCubicBezier();
 	Super::OnConstruction(Transform);
 }
 

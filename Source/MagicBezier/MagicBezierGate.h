@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <vector>
 #include "MagicBezierGate.generated.h"
 
 UCLASS()
@@ -10,7 +11,6 @@ class MAGICBEZIER_API AMagicBezierGate : public AActor
 	GENERATED_BODY()
 	
 public:
-	void CalculateControlPoints();
 	// Sets default values for this actor's properties
 	AMagicBezierGate();
 
@@ -23,7 +23,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void OnConstruction(const FTransform& Transform) override;
-
 	
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -41,8 +40,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
 	FVector P3;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	float Length;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	float BezierStrength = 1000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	float DebugLineNumberOfPoints = 20;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	AMagicBezierGate* NextGate;
@@ -51,4 +56,8 @@ public:
 	UStaticMesh* Gate;
 
 	UStaticMeshComponent* GateVisual;
+
+private:
+	std::vector<FVector> CubicBezierCurvePoints;
+	void CalculateControlCubicBezier();
 };
