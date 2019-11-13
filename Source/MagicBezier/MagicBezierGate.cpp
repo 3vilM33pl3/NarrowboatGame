@@ -12,21 +12,26 @@ void AMagicBezierGate::CalculateControlCubicBezier()
 	P0 = GetActorLocation();
 
 	P1 = GetActorForwardVector();
-	P1.X = P1.X * BezierStrength; // Forward vector is a unit vector
+	P1 = P1.ForwardVector;
+	P1.X = P1.X * BezierStrength / sqrt(pow(P1.X,2) + pow(P1.Y,2)); // Forward vector is a unit vector
 	P1 = GetTransform().TransformPosition(P1);
-	
-	if(NextGate != nullptr)
+
+	if(NextGate != this)
 	{
 		P3 = NextGate->GetActorLocation();
 		
 		P2 = NextGate->GetActorForwardVector();
-		P2.X = P2.X * BezierStrength * -1;
+		P2 = P2.BackwardVector;
+		P2.X = P2.X * BezierStrength / sqrt(pow(P2.X,2)+pow(P2.Y,2));
 		P2 = NextGate->GetTransform().TransformPosition(P2);
+		
+		const auto PointsApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0 / 50);
+		const auto LengthApproximation = MagicBezierFunctions::CubicBezierCurveLength(PointsApproximation);
+		CubicBezierCurvePoints = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / LengthApproximation)*DebugPointsDistance/10) ;
+		Length = MagicBezierFunctions::CubicBezierCurveLength(CubicBezierCurvePoints);
+		
 	}
 
-	CubicBezierCurvePoints = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0f / DebugLineNumberOfPoints);
-	Length = MagicBezierFunctions::CubicBezierCurveLength(CubicBezierCurvePoints);
-	
 }
 
 // Sets default values
@@ -54,6 +59,8 @@ AMagicBezierGate::AMagicBezierGate()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load gate static mesh"));
 	}
+
+	NextGate = this; // If there is no next gate point to itself (default)
 	
 }
 
@@ -68,11 +75,17 @@ void AMagicBezierGate::BeginPlay()
 void AMagicBezierGate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	for(FVector L: CubicBezierCurvePoints)
+
+	if(NextGate != this)
 	{
-		DrawDebugPoint(GetWorld(), L, 10, FColor(255, 0, 0), false, 0);
+		for (FVector L : CubicBezierCurvePoints)
+		{
+			DrawDebugPoint(GetWorld(), L, 10, FColor(255, 0, 0), false, 0);
+			DrawDebugDirectionalArrow(GetWorld(), P0, P1, 50, FColor(255, 255, 0), false,-1,0,10);
+			DrawDebugDirectionalArrow(GetWorld(), P3, P2, 50, FColor(0, 255, 255), false, -1, 0, 10);
+		}
 	}
+	
 	
 	
 
@@ -80,7 +93,7 @@ void AMagicBezierGate::Tick(float DeltaTime)
 
 void AMagicBezierGate::OnConstruction(const FTransform& Transform)
 {
-	CalculateControlCubicBezier();
+	//CalculateControlCubicBezier();
 	Super::OnConstruction(Transform);
 }
 

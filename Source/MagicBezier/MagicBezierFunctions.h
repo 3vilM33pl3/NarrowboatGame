@@ -16,7 +16,7 @@ public:
 
 	static FVector CubicBezierPoint(const FVector P0, const FVector P1, const FVector P2, const FVector P3, const float T)
 	{
-		return pow(1.0f - T, 3) * P0 + 3 * pow(1 - T, 2) * P1 + 3*(1-T)*pow(T,2)*P2 + pow(T, 3)*P3;
+		return pow(1.0 - T, 3) * P0 + 3 * pow(1.0 - T, 2) * T * P1 + 3*(1.0 - T)*pow(T,2)*P2 + pow(T, 3)*P3;
 	}
 
 	static std::vector<FVector> CubicBezierCurve(const FVector P0, const FVector P1, const FVector P2, const FVector P3, const float T)
@@ -24,7 +24,8 @@ public:
 		std::vector<FVector> BezierCurvePoints;
 		for (float i = 0; i <= 1; i=i+T)
 		{
-			BezierCurvePoints.push_back(CubicBezierPoint(P0, P1, P2, P3, i));
+			FVector P = CubicBezierPoint(P0, P1, P2, P3, i);
+			BezierCurvePoints.push_back(P);
 		}
 		return BezierCurvePoints;
 	}
@@ -34,8 +35,8 @@ public:
 		float Length = 0;
 		for(int i = 0; i < BezierCurvePoints.size() - 2; i++)
 		{
-			Length = +FVector::Distance(BezierCurvePoints.at(i), BezierCurvePoints.at(i + 1));
+			Length =+	FVector::Distance(BezierCurvePoints.at(i), BezierCurvePoints.at(i + 1));
 		}
-		return Length;
+		return abs(Length);
 	}
 };

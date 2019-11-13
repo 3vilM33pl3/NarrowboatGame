@@ -41,13 +41,13 @@ public:
 	FVector P3;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
-	float Length;
+	float Length = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	float BezierStrength = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
-	float DebugLineNumberOfPoints = 20;
+	float DebugPointsDistance = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	AMagicBezierGate* NextGate;
