@@ -59,5 +59,5 @@ public:
 
 private:
 	std::vector<FVector> CubicBezierCurvePoints;
-	void CalculateControlCubicBezier();
+	void CalculateControlPointsCubicBezier();
 };

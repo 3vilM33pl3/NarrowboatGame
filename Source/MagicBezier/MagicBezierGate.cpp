@@ -7,7 +7,7 @@
 #include "MagicBezierFunctions.h"
 #include "DrawDebugHelpers.h"
 
-void AMagicBezierGate::CalculateControlCubicBezier()
+void AMagicBezierGate::CalculateControlPointsCubicBezier()
 {
 	P0 = GetActorLocation();
 
@@ -67,7 +67,7 @@ AMagicBezierGate::AMagicBezierGate()
 // Called when the game starts or when spawned
 void AMagicBezierGate::BeginPlay()
 {
-	CalculateControlCubicBezier();
+	CalculateControlPointsCubicBezier();
 	Super::BeginPlay();	
 }
 
@@ -93,7 +93,7 @@ void AMagicBezierGate::Tick(float DeltaTime)
 
 void AMagicBezierGate::OnConstruction(const FTransform& Transform)
 {
-	//CalculateControlCubicBezier();
+	//CalculateControlPointsCubicBezier();
 	Super::OnConstruction(Transform);
 }
 

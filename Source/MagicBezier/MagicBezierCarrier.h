@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "MagicBezierGate.h"
 #include "MagicBezierCarrier.generated.h"
 
 UCLASS()
@@ -26,4 +27,38 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	AMagicBezierGate* LastGate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	AMagicBezierGate* NextGate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	FVector P0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	FVector P1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	FVector P2;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	FVector P3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	float Length = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	float BezierStrength = 1000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	float CarrierSpeed = 200;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	UStaticMesh* Carrier;
+
+private:
+	void CalculateControlPointsCubicBezier();
+	float CalculateLength(FVector P0, FVector P1, FVector P2, FVector P3, float SegmentInterval);
+	
 };
