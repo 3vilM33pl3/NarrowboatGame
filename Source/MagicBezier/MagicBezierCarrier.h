@@ -57,8 +57,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	UStaticMesh* Carrier;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	float SegmentInterval = 50;
+
+	UStaticMeshComponent* CarrierVisual;
+
 private:
 	void CalculateControlPointsCubicBezier();
-	float CalculateLength(FVector P0, FVector P1, FVector P2, FVector P3, float SegmentInterval);
+	float CalculateLength();
 	
 };

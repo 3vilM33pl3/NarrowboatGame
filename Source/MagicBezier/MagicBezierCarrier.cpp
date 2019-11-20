@@ -1,21 +1,44 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+	// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MagicBezierCarrier.h"
+#include  "Components/StaticMeshComponent.h"
 #include "MagicBezierFunctions.h"
+#include "Engine/StaticMesh.h"
+#include "ConstructorHelpers.h"
 
-// Sets default values
+	// Sets default values
 AMagicBezierCarrier::AMagicBezierCarrier()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Setup carrier
+	USceneComponent* EmptyComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	RootComponent = EmptyComponent;
+
+	CarrierVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
+	CarrierVisual->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CarrierVisualAsset(TEXT("/Game/MagicBezier/SM_Boat.SM_Boat"));
+	if (CarrierVisualAsset.Succeeded())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Carrier static mesh loaded"));
+
+		Carrier = CarrierVisualAsset.Object;
+		CarrierVisual->SetStaticMesh(Carrier);
+	    CarrierVisual->SetCollisionProfileName(TEXT("NoCollision"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load gate static mesh"));
+	}
+	
 }
 
 // Called when the game starts or when spawned
 void AMagicBezierCarrier::BeginPlay()
 {
 	Super::BeginPlay();
+	Length = CalculateLength();
 	
 }
 
@@ -69,12 +92,12 @@ void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 	}
 }
 
-float AMagicBezierCarrier::CalculateLength(FVector P0, FVector P1, FVector P2, FVector P3, float SegmentInterval = 50)
+float AMagicBezierCarrier::CalculateLength()
 {
 	const auto PointsApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0 / 50);
 	const auto LengthApproximation = MagicBezierFunctions::CubicBezierCurveLength(PointsApproximation);
 	const auto SecondLengthApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / LengthApproximation) * SegmentInterval / 10);
-	Length = MagicBezierFunctions::CubicBezierCurveLength(SecondLengthApproximation);
+	return MagicBezierFunctions::CubicBezierCurveLength(SecondLengthApproximation);
 }
 
 
