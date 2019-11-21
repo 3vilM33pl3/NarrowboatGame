@@ -62,6 +62,8 @@ public:
 
 	UStaticMeshComponent* CarrierVisual;
 
+	float ProgressAlongCurve = 1.0f;
+
 private:
 	void CalculateControlPointsCubicBezier();
 	float CalculateLength();

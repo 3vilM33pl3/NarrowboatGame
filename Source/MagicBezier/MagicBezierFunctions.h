@@ -16,7 +16,10 @@ public:
 
 	static FVector CubicBezierLocation(const FVector P0, const FVector P1, const FVector P2, const FVector P3, const float T)
 	{
-		return pow(1.0 - T, 3) * P0 + 3 * pow(1.0 - T, 2) * T * P1 + 3*(1.0 - T)*pow(T,2)*P2 + pow(T, 3)*P3;
+		auto Tz0 = P0.Z;
+		FVector Rlocation = pow(1.0 - T, 3) * P0 + 3 * pow(1.0 - T, 2) * T * P1 + 3*(1.0 - T)*pow(T,2)*P2 + pow(T, 3)*P3;
+		Rlocation.Z = P0.Z;
+		return Rlocation;
 	}
 
 	static std::vector<FVector> CubicBezierCurve(const FVector P0, const FVector P1, const FVector P2, const FVector P3, const float T)
@@ -33,9 +36,12 @@ public:
 	static float CubicBezierCurveLength(std::vector<FVector> BezierCurvePoints)
 	{
 		float Length = 0;
-		for(int i = 0; i < BezierCurvePoints.size() - 2; i++)
+		if (BezierCurvePoints.size() - 2 >= 0)
 		{
-			Length =+	FVector::Distance(BezierCurvePoints.at(i), BezierCurvePoints.at(i + 1));
+			for (int i = 0; i < BezierCurvePoints.size() - 2; i++)
+			{
+				Length = +FVector::Distance(BezierCurvePoints.at(i), BezierCurvePoints.at(i + 1));
+			}
 		}
 		return abs(Length);
 	}

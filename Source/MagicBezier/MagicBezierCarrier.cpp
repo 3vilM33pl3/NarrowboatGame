@@ -38,8 +38,9 @@ AMagicBezierCarrier::AMagicBezierCarrier()
 void AMagicBezierCarrier::BeginPlay()
 {
 	Super::BeginPlay();
+	CalculateControlPointsCubicBezier();
 	Length = CalculateLength();
-	
+	this->SetActorLocation(LastGate->GetActorLocation());
 }
 
 // Called every frame
@@ -47,10 +48,12 @@ void AMagicBezierCarrier::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float T = DeltaTime * CarrierSpeed/ Length;
-	FVector Location = MagicBezierFunctions::CubicBezierLocation(P0, P1, P2, P3, T);
-
-	this->SetActorLocation(Location);
+	if (ProgressAlongCurve > 0.0f)
+	{
+		ProgressAlongCurve = ProgressAlongCurve - DeltaTime * CarrierSpeed / Length;
+		const FVector Location = MagicBezierFunctions::CubicBezierLocation(P0, P1, P2, P3, ProgressAlongCurve);
+		this->SetActorLocation(Location);
+	}
 
 }
 
@@ -96,8 +99,14 @@ float AMagicBezierCarrier::CalculateLength()
 {
 	const auto PointsApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0 / 50);
 	const auto LengthApproximation = MagicBezierFunctions::CubicBezierCurveLength(PointsApproximation);
-	const auto SecondLengthApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / LengthApproximation) * SegmentInterval / 10);
-	return MagicBezierFunctions::CubicBezierCurveLength(SecondLengthApproximation);
+	if (LengthApproximation > 0) {
+		const auto SecondLengthApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / LengthApproximation) * SegmentInterval / 10);
+		return MagicBezierFunctions::CubicBezierCurveLength(SecondLengthApproximation);
+	} else
+	{
+		return 0;
+	}
+
 }
 
 
