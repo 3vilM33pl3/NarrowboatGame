@@ -28,9 +28,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
-	AMagicBezierGate* LastGate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	AMagicBezierGate* NextGate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
@@ -62,7 +59,7 @@ public:
 
 	UStaticMeshComponent* CarrierVisual;
 
-	float ProgressAlongCurve = 1.0f;
+	float ProgressAlongCurve = 0.0f;
 
 private:
 	void CalculateControlPointsCubicBezier();

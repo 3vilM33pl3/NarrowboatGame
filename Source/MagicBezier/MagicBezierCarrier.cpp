@@ -29,7 +29,7 @@ AMagicBezierCarrier::AMagicBezierCarrier()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to load gate static mesh"));
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load boat static mesh"));
 	}
 	
 }
@@ -40,7 +40,7 @@ void AMagicBezierCarrier::BeginPlay()
 	Super::BeginPlay();
 	CalculateControlPointsCubicBezier();
 	Length = CalculateLength();
-	this->SetActorLocation(LastGate->GetActorLocation());
+	this->SetActorLocation(this->GetActorLocation());
 }
 
 // Called every frame
@@ -48,14 +48,20 @@ void AMagicBezierCarrier::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (ProgressAlongCurve > 0.0f)
+	if (ProgressAlongCurve < 1.0f)
 	{
-		ProgressAlongCurve = ProgressAlongCurve - DeltaTime * CarrierSpeed / Length;
+		ProgressAlongCurve = ProgressAlongCurve + DeltaTime * CarrierSpeed / Length;
 		const FVector Location = MagicBezierFunctions::CubicBezierLocation(P0, P1, P2, P3, ProgressAlongCurve);
 		this->SetActorLocation(Location);
 
 		const FVector Rotation = MagicBezierFunctions::CubicBezierCurveDerivative(P0, P1, P2, P3, ProgressAlongCurve);
 		this->SetActorRotation(Rotation.Rotation());
+	} else
+	{
+		Length = NextGate->Length;
+		NextGate = NextGate->NextGate;
+		ProgressAlongCurve = 0.0;
+		CalculateControlPointsCubicBezier();
 	}
 
 }
@@ -69,22 +75,14 @@ void AMagicBezierCarrier::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 {
-	if (LastGate != nullptr)
-	{
-		P0 = LastGate->GetActorLocation();
-		P1 = LastGate->GetActorForwardVector();
-		BezierStrength = LastGate->BezierStrength;
-	} else
-	{
-		P0 = this->GetActorLocation();
-		P1 = this->GetActorForwardVector();
-	}
-	
+
+	P0 = this->GetActorLocation();
+	P1 = this->GetActorForwardVector();
+	BezierStrength = NextGate->BezierStrength;
+
 	P1 = P1.ForwardVector;
 	P1.X = P1.X * BezierStrength / sqrt(pow(P1.X, 2) + pow(P1.Y, 2)); // Forward vector is a unit vector
-	P1 = LastGate->GetTransform().TransformPosition(P1);
-
-	
+	P1 = this->GetTransform().TransformPosition(P1);
 
 	if (NextGate != nullptr)
 	{
