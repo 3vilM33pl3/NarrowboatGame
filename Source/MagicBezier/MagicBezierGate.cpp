@@ -2,7 +2,11 @@
 #include "ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
 #include "ComponentReregisterContext.h"
+
+#if WITH_EDITOR
 #include "Editor.h"
+#endif
+
 #include <Runtime\Engine\Classes\Kismet\KismetMathLibrary.h>
 #include "MagicBezierFunctions.h"
 #include "DrawDebugHelpers.h"
@@ -16,7 +20,7 @@ void AMagicBezierGate::CalculateControlPointsCubicBezier()
 	P1.X = P1.X * BezierStrength / sqrt(pow(P1.X,2) + pow(P1.Y,2)); // Forward vector is a unit vector
 	P1 = GetTransform().TransformPosition(P1);
 
-	if(NextGate != this)
+	if(NextGate != this && NextGate != nullptr)
 	{
 		P3 = NextGate->GetActorLocation();
 		

@@ -75,17 +75,16 @@ void AMagicBezierCarrier::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 {
-
-	P0 = this->GetActorLocation();
-	P1 = this->GetActorForwardVector();
-	BezierStrength = NextGate->BezierStrength;
-
-	P1 = P1.ForwardVector;
-	P1.X = P1.X * BezierStrength / sqrt(pow(P1.X, 2) + pow(P1.Y, 2)); // Forward vector is a unit vector
-	P1 = this->GetTransform().TransformPosition(P1);
-
 	if (NextGate != nullptr)
 	{
+		P0 = this->GetActorLocation();
+		P1 = this->GetActorForwardVector();
+		BezierStrength = NextGate->BezierStrength;
+
+		P1 = P1.ForwardVector;
+		P1.X = P1.X * BezierStrength / sqrt(pow(P1.X, 2) + pow(P1.Y, 2)); // Forward vector is a unit vector
+		P1 = this->GetTransform().TransformPosition(P1);
+
 		P3 = NextGate->GetActorLocation();
 
 		P2 = NextGate->GetActorForwardVector();
