@@ -24,16 +24,10 @@ void AMagicBezierGate::CalculateControlPointsCubicBezier()
 		P2 = P2.BackwardVector;
 		P2.X = P2.X * BezierStrength / sqrt(pow(P2.X,2)+pow(P2.Y,2));
 		P2 = NextGate->GetTransform().TransformPosition(P2);
-		
-		const auto PointsApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0 / 50);
-		const auto LengthApproximation = MagicBezierFunctions::CubicBezierCurveLength(PointsApproximation);
-		if (LengthApproximation > 0) {
-			CubicBezierCurvePoints = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / LengthApproximation) * DebugPointsDistance / 10);
-			Length = MagicBezierFunctions::CubicBezierCurveLength(CubicBezierCurvePoints);
-		} else
-		{
-			Length = 0;
-		}
+
+		Length = MagicBezierFunctions::CubicBezierLengthEstimate(P0, P1, P2, P3, 50);
+		CubicBezierCurvePoints = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / Length) * DebugPointsDistance);
+
 	}
 
 }

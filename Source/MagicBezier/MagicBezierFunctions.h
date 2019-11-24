@@ -52,4 +52,20 @@ public:
 		return abs(Length);
 	}
 
+	static float CubicBezierLengthEstimate(FVector P0, FVector P1, FVector P2, FVector P3, float SegmentInterval)
+	{
+		const auto PointsApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, 1.0 / 50);
+		const auto LengthApproximation = MagicBezierFunctions::CubicBezierCurveLength(PointsApproximation);
+		if (LengthApproximation > 0) {
+			const auto SecondLengthApproximation = MagicBezierFunctions::CubicBezierCurve(P0, P1, P2, P3, (1.0 / LengthApproximation) * SegmentInterval / 10);
+			return MagicBezierFunctions::CubicBezierCurveLength(SecondLengthApproximation);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
 };
+
+

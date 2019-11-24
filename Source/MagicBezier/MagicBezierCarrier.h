@@ -63,6 +63,5 @@ public:
 
 private:
 	void CalculateControlPointsCubicBezier();
-	float CalculateLength();
 	
 };
