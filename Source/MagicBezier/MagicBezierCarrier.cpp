@@ -53,6 +53,9 @@ void AMagicBezierCarrier::Tick(float DeltaTime)
 		ProgressAlongCurve = ProgressAlongCurve - DeltaTime * CarrierSpeed / Length;
 		const FVector Location = MagicBezierFunctions::CubicBezierLocation(P0, P1, P2, P3, ProgressAlongCurve);
 		this->SetActorLocation(Location);
+
+		const FVector Rotation = MagicBezierFunctions::CubicBezierCurveDerivative(P0, P1, P2, P3, ProgressAlongCurve);
+		this->SetActorRotation(Rotation.Rotation());
 	}
 
 }

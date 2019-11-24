@@ -16,8 +16,14 @@ public:
 
 	static FVector CubicBezierLocation(const FVector P0, const FVector P1, const FVector P2, const FVector P3, const float T)
 	{
-		auto Tz0 = P0.Z;
 		FVector Rlocation = pow(1.0 - T, 3) * P0 + 3 * pow(1.0 - T, 2) * T * P1 + 3*(1.0 - T)*pow(T,2)*P2 + pow(T, 3)*P3;
+		Rlocation.Z = P0.Z;
+		return Rlocation;
+	}
+
+	static FVector CubicBezierCurveDerivative(const FVector P0, const FVector P1, const FVector P2, const FVector P3, const float T)
+	{
+		FVector Rlocation = 3 * pow(1.0 - T, 2) * (P1 - P0) + 6 * (1 - T) * T * (P2 - P1) + 3 * pow(T, 2) * (P3 - P2);
 		Rlocation.Z = P0.Z;
 		return Rlocation;
 	}
