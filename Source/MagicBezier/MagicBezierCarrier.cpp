@@ -39,6 +39,12 @@ void AMagicBezierCarrier::BeginPlay()
 {
 	Super::BeginPlay();
 	CalculateControlPointsCubicBezier();
+	ForwardBezierStrength = InitialBezierStrength;
+	if(NextGate != nullptr)
+	{
+		BackwardBezierStrength = NextGate->BackwardBezierStrength;
+	}
+	
 	Length = MagicBezierFunctions::CubicBezierLengthEstimate(P0, P1, P2, P3, SegmentInterval);
 	this->SetActorLocation(this->GetActorLocation());
 }
@@ -59,7 +65,9 @@ void AMagicBezierCarrier::Tick(float DeltaTime)
 	} else
 	{
 		Length = NextGate->Length;
+		ForwardBezierStrength = NextGate->ForwardBezierStrength;
 		NextGate = NextGate->NextGate;
+		BackwardBezierStrength = NextGate->BackwardBezierStrength;
 		ProgressAlongCurve = 0.0;
 		CalculateControlPointsCubicBezier();
 	}
@@ -79,17 +87,17 @@ void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 	{
 		P0 = this->GetActorLocation();
 		P1 = this->GetActorForwardVector();
-		BezierStrength = NextGate->BezierStrength;
+		//BezierStrength = NextGate->BezierStrength;
 
 		P1 = P1.ForwardVector;
-		P1.X = P1.X * BezierStrength / sqrt(pow(P1.X, 2) + pow(P1.Y, 2)); // Forward vector is a unit vector
+		P1.X = P1.X * ForwardBezierStrength / sqrt(pow(P1.X, 2) + pow(P1.Y, 2)); // Forward vector is a unit vector
 		P1 = this->GetTransform().TransformPosition(P1);
 
 		P3 = NextGate->GetActorLocation();
 
 		P2 = NextGate->GetActorForwardVector();
 		P2 = P2.BackwardVector;
-		P2.X = P2.X * BezierStrength / sqrt(pow(P2.X, 2) + pow(P2.Y, 2));
+		P2.X = P2.X * BackwardBezierStrength / sqrt(pow(P2.X, 2) + pow(P2.Y, 2));
 		P2 = NextGate->GetTransform().TransformPosition(P2);
 
 	}

@@ -46,7 +46,13 @@ public:
 	float Length = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
-	float BezierStrength = 1000;
+	float InitialBezierStrength = 1000;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	float ForwardBezierStrength = 1000;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Magic Bezier")
+	float BackwardBezierStrength = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	float CarrierSpeed = 200;

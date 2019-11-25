@@ -26,7 +26,9 @@ public:
 	
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif	
+#endif
+
+	virtual bool ShouldTickIfViewportsOnly() const override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Magic Bezier")
 	FVector P0;
@@ -44,8 +46,11 @@ public:
 	float Length = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
-	float BezierStrength = 1000;
+	float ForwardBezierStrength = 1000;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	float BackwardBezierStrength = 1000;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	float DebugPointsDistance = 5;
 

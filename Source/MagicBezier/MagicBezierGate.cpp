@@ -10,6 +10,7 @@
 #include <Runtime\Engine\Classes\Kismet\KismetMathLibrary.h>
 #include "MagicBezierFunctions.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 void AMagicBezierGate::CalculateControlPointsCubicBezier()
 {
@@ -17,7 +18,7 @@ void AMagicBezierGate::CalculateControlPointsCubicBezier()
 
 	P1 = GetActorForwardVector();
 	P1 = P1.ForwardVector;
-	P1.X = P1.X * BezierStrength / sqrt(pow(P1.X,2) + pow(P1.Y,2)); // Forward vector is a unit vector
+	P1.X = P1.X * ForwardBezierStrength / sqrt(pow(P1.X,2) + pow(P1.Y,2)); // Forward vector is a unit vector
 	P1 = GetTransform().TransformPosition(P1);
 
 	if(NextGate != this && NextGate != nullptr)
@@ -26,7 +27,7 @@ void AMagicBezierGate::CalculateControlPointsCubicBezier()
 		
 		P2 = NextGate->GetActorForwardVector();
 		P2 = P2.BackwardVector;
-		P2.X = P2.X * BezierStrength / sqrt(pow(P2.X,2)+pow(P2.Y,2));
+		P2.X = P2.X * NextGate->BackwardBezierStrength / sqrt(pow(P2.X,2)+pow(P2.Y,2));
 		P2 = NextGate->GetTransform().TransformPosition(P2);
 
 		Length = MagicBezierFunctions::CubicBezierLengthEstimate(P0, P1, P2, P3, 50);
@@ -41,6 +42,11 @@ AMagicBezierGate::AMagicBezierGate()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick =  true;
+	if (WITH_EDITOR)
+	{
+		PrimaryActorTick.bCanEverTick = true;
+		PrimaryActorTick.bStartWithTickEnabled = true;
+	}
 
 	USceneComponent* EmptyComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	RootComponent = EmptyComponent;
@@ -95,12 +101,24 @@ void AMagicBezierGate::Tick(float DeltaTime)
 
 void AMagicBezierGate::OnConstruction(const FTransform& Transform)
 {
-	//CalculateControlPointsCubicBezier();
+	if(WITH_EDITOR)
+	{
+		CalculateControlPointsCubicBezier();
+		const TSubclassOf<AMagicBezierGate> ClassToFind = AMagicBezierGate::StaticClass();
+		TArray<AActor*> FoundGates;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, FoundGates);
+
+		for (AActor* ActorGate : FoundGates)
+		{
+			auto Gate = Cast<AMagicBezierGate>(ActorGate);
+			Gate->CalculateControlPointsCubicBezier();
+		}
+		
+	}
 	Super::OnConstruction(Transform);
 }
 
 #if WITH_EDITOR
-
 void AMagicBezierGate::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	TArray<UActorComponent*> MyComponents;
@@ -125,3 +143,7 @@ void AMagicBezierGate::PostEditChangeProperty(FPropertyChangedEvent& PropertyCha
 }
 #endif
 
+bool AMagicBezierGate::ShouldTickIfViewportsOnly() const
+{
+	return true;
+}
