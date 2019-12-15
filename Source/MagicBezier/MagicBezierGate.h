@@ -21,6 +21,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void ReCalculate();
 
 	void OnConstruction(const FTransform& Transform) override;
 	
@@ -29,6 +30,12 @@ public:
 #endif
 
 	virtual bool ShouldTickIfViewportsOnly() const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	FIntVector HexCubeCoordinates;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	int HexRadius;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Magic Bezier")
 	FVector P0;
@@ -46,10 +53,10 @@ public:
 	float Length = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
-	float ForwardBezierStrength = 1000;
+	float ForwardBezierStrength = 3000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
-	float BackwardBezierStrength = 1000;
+	float BackwardBezierStrength = 3000;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	float DebugPointsDistance = 5;

@@ -99,7 +99,7 @@ void AMagicBezierGate::Tick(float DeltaTime)
 
 }
 
-void AMagicBezierGate::OnConstruction(const FTransform& Transform)
+void AMagicBezierGate::ReCalculate()
 {
 	if(WITH_EDITOR)
 	{
@@ -115,6 +115,11 @@ void AMagicBezierGate::OnConstruction(const FTransform& Transform)
 		}
 		
 	}
+}
+
+void AMagicBezierGate::OnConstruction(const FTransform& Transform)
+{
+	ReCalculate();
 	Super::OnConstruction(Transform);
 }
 
@@ -137,6 +142,11 @@ void AMagicBezierGate::PostEditChangeProperty(FPropertyChangedEvent& PropertyCha
 				GEditor->EditorUpdateComponents();
 			}
 		}
+	} else if (PropertyName == GET_MEMBER_NAME_CHECKED(AMagicBezierGate, HexCubeCoordinates))
+	{
+		MagicBezierFunctions::Cube2XY(HexCubeCoordinates, P0, HexRadius);
+		CalculateControlPointsCubicBezier();
+		ReCalculate();
 	}
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);

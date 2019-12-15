@@ -66,6 +66,20 @@ public:
 		}
 	}
 
+	static void Cube2XY(const FIntVector Cube, FVector &XYCoord, float radius)
+	{
+		const float height = 2 * radius;
+		const float width = sqrt(3) * height;
+
+		const int32 col = Cube.X + (Cube.Z + (Cube.Z & 1)) / 2;
+		const int32 row = -1 * Cube.Z;
+
+		XYCoord.Y = float(row) * float(height) * 0.75;
+		XYCoord.X = (float(col) * float(width) - float(row & 1) * float(width) / 2)/2;
+		XYCoord.Z = 0;
+		
+	}
+
 };
 
 
