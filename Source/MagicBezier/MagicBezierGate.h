@@ -57,8 +57,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
 	float BackwardBezierStrength = 3000;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
+	bool DebugLine = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "DebugLine"), Category = "Magic Bezier")
 	float DebugPointsDistance = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magic Bezier")
@@ -72,4 +75,5 @@ public:
 private:
 	std::vector<FVector> CubicBezierCurvePoints;
 	void CalculateControlPointsCubicBezier();
+	void SetDebugLineVisibility(bool Visible);
 };
