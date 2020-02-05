@@ -37,6 +37,15 @@ void AMagicBezierGate::CalculateControlPointsCubicBezier()
 
 }
 
+void AMagicBezierGate::SetDebugLineVisibility(bool Visible)
+{
+	this->DebugLine = Visible;
+	if(NextGate != nullptr && NextGate->DebugLine != Visible)
+	{
+		NextGate->SetDebugLineVisibility(Visible);
+	}
+}
+
 // Sets default values
 AMagicBezierGate::AMagicBezierGate()
 {
@@ -84,7 +93,7 @@ void AMagicBezierGate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(NextGate != this)
+	if(NextGate != this && DebugLine == true)
 	{
 		for (FVector L : CubicBezierCurvePoints)
 		{
@@ -94,9 +103,6 @@ void AMagicBezierGate::Tick(float DeltaTime)
 		}
 	}
 	
-	
-	
-
 }
 
 void AMagicBezierGate::ReCalculate()
@@ -147,6 +153,12 @@ void AMagicBezierGate::PostEditChangeProperty(FPropertyChangedEvent& PropertyCha
 		MagicBezierFunctions::Cube2XY(HexCubeCoordinates, P0, HexRadius);
 		CalculateControlPointsCubicBezier();
 		ReCalculate();
+	} else if (PropertyName == GET_MEMBER_NAME_CHECKED(AMagicBezierGate, DebugLine))
+	{
+		if (NextGate != nullptr)
+		{
+			NextGate->SetDebugLineVisibility(DebugLine);
+		}
 	}
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);

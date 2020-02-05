@@ -62,7 +62,7 @@ void AMagicBezierCarrier::Tick(float DeltaTime)
 
 		const FVector Rotation = MagicBezierFunctions::CubicBezierCurveDerivative(P0, P1, P2, P3, ProgressAlongCurve);
 		this->SetActorRotation(Rotation.Rotation());
-	} else
+	} else if (NextGate != nullptr)
 	{
 		Length = NextGate->Length;
 		ForwardBezierStrength = NextGate->ForwardBezierStrength;
@@ -97,11 +97,12 @@ void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 
 		P2 = NextGate->GetActorForwardVector();
 		P2 = P2.BackwardVector;
-		P2.X = P2.X * BackwardBezierStrength / sqrt(pow(P2.X, 2) + pow(P2.Y, 2));
+		P2.X = P2.X * NextGate->BackwardBezierStrength / sqrt(pow(P2.X, 2) + pow(P2.Y, 2));
 		P2 = NextGate->GetTransform().TransformPosition(P2);
 
 	}
 }
+
 
 
 
