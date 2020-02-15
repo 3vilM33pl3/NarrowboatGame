@@ -107,7 +107,3 @@ void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 
 	}
 }
-
-
-
-
