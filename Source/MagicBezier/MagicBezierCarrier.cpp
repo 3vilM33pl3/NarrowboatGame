@@ -1,4 +1,4 @@
-	// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MagicBezierCarrier.h"
 #include  "Components/StaticMeshComponent.h"
@@ -9,7 +9,7 @@
 	// Sets default values
 AMagicBezierCarrier::AMagicBezierCarrier()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Setup carrier
@@ -25,13 +25,13 @@ AMagicBezierCarrier::AMagicBezierCarrier()
 
 		Carrier = CarrierVisualAsset.Object;
 		CarrierVisual->SetStaticMesh(Carrier);
-	    CarrierVisual->SetCollisionProfileName(TEXT("NoCollision"));
+		CarrierVisual->SetCollisionProfileName(TEXT("NoCollision"));
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load boat static mesh"));
 	}
-	
+
 }
 
 // Called when the game starts or when spawned
@@ -40,11 +40,11 @@ void AMagicBezierCarrier::BeginPlay()
 	Super::BeginPlay();
 	CalculateControlPointsCubicBezier();
 	ForwardBezierStrength = InitialBezierStrength;
-	if(NextGate != nullptr)
+	if (NextGate != nullptr)
 	{
 		BackwardBezierStrength = NextGate->BackwardBezierStrength;
 	}
-	
+
 	Length = MagicBezierFunctions::CubicBezierLengthEstimate(P0, P1, P2, P3, SegmentInterval);
 	this->SetActorLocation(this->GetActorLocation());
 }
@@ -62,14 +62,19 @@ void AMagicBezierCarrier::Tick(float DeltaTime)
 
 		const FVector Rotation = MagicBezierFunctions::CubicBezierCurveDerivative(P0, P1, P2, P3, ProgressAlongCurve);
 		this->SetActorRotation(Rotation.Rotation());
-	} else if (NextGate != nullptr)
+	}
+	else
 	{
-		Length = NextGate->Length;
-		ForwardBezierStrength = NextGate->ForwardBezierStrength;
-		NextGate = NextGate->NextGate;
-		BackwardBezierStrength = NextGate->BackwardBezierStrength;
-		ProgressAlongCurve = 0.0;
-		CalculateControlPointsCubicBezier();
+		if (NextGate != nullptr && NextGate->NextGate != nullptr)
+		{
+			auto const CurrentGate = NextGate;
+			Length = CurrentGate->Length;
+			ForwardBezierStrength = CurrentGate->ForwardBezierStrength;
+			BackwardBezierStrength = CurrentGate->NextGate->BackwardBezierStrength;
+			NextGate = CurrentGate->NextGate;
+			ProgressAlongCurve = 0.0;
+			CalculateControlPointsCubicBezier();
+		}
 	}
 
 }
@@ -102,7 +107,6 @@ void AMagicBezierCarrier::CalculateControlPointsCubicBezier()
 
 	}
 }
-
 
 
 
